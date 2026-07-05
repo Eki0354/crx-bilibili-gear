@@ -1,3 +1,3 @@
-import { optimizeComments } from "./video.content/comment";
+import { optimizeComments } from "./video.content/comments";
 
 export default defineUnlistedScript(optimizeComments);

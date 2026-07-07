@@ -14,6 +14,10 @@ function setLastTime(type = 1 | 2) {
 }
 
 export async function receiveVipPrivilege(type = 1 | 2) {
+  const user = (window as any).__BiliUser__?.cache?.data;
+  // 非大会员不领取
+  if (!user || user.vip.type !== 2) return;
+
   const last = getLastTime(type);
   const now = Date.now();
 

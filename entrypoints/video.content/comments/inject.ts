@@ -1,4 +1,5 @@
 import { loopExec, queryAllDeep, observeShadowRoots } from "@/utils/dom";
+import shareSvg from "~/assets/svg/share.svg?raw";
 
 /**
  * 监听 bili-comment-renderer / bili-comment-reply-renderer 节点渲染，
@@ -94,26 +95,17 @@ function processTargetElement(el: Element, source: string) {
       const moreNode = parentNode.querySelector("#more");
 
       if (moreNode) {
-        const shareSvg = document
-          .querySelector("#share-btn-outer > .video-share-icon")
-          ?.cloneNode(true);
+        const shareBtn = document.createElement("button");
 
-        if (shareSvg) {
-          (shareSvg as HTMLElement).setAttribute("width", "16");
-          (shareSvg as HTMLElement).setAttribute("height", "16");
+        shareBtn.id = "share";
+        shareBtn.style.position = "relative";
+        shareBtn.style.textAlign = "left";
 
-          const shareBtn = document.createElement("button");
+        shareBtn.addEventListener("click", handleShareClick);
 
-          shareBtn.id = "share";
-          shareBtn.style.position = "relative";
-          shareBtn.style.textAlign = "left";
+        shareBtn.innerHTML = shareSvg;
 
-          shareBtn.addEventListener("click", handleShareClick);
-
-          shareBtn.appendChild(shareSvg);
-
-          parentNode.insertBefore(shareBtn, moreNode);
-        }
+        parentNode.insertBefore(shareBtn, moreNode);
       }
     }
 

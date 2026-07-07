@@ -1,0 +1,1 @@
+declare var __bili_gear_share_info: any;

@@ -7,6 +7,7 @@ export default defineConfig({
     disabled: true,
   },
   manifest: {
+    permissions: ["clipboardWrite"],
     web_accessible_resources: [
       {
         resources: ["inject-comments.js"],

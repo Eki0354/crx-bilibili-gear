@@ -1,4 +1,4 @@
-import { loopExec } from "@/utils/dom";
+import { loopExec, queryAllDeep, observeShadowRoots } from "@/utils/dom";
 
 /**
  * 监听 bili-comment-renderer / bili-comment-reply-renderer 节点渲染，
@@ -12,39 +12,6 @@ const TARGET_SELECTOR = "bili-comment-renderer, bili-comment-reply-renderer";
 
 const processedHosts = new WeakSet<Element>();
 const locationAppended = new WeakSet<Element>();
-
-// ── 递归遍历 Shadow DOM 查找目标元素 ──────────────────────────
-function queryAllDeep(root: ParentNode, selector: string): Element[] {
-  const results: Element[] = [];
-  results.push(...root.querySelectorAll(selector));
-  for (const el of root.querySelectorAll("*")) {
-    const shadow = (el as Element).shadowRoot;
-    if (shadow) results.push(...queryAllDeep(shadow, selector));
-  }
-  return results;
-}
-
-// ── 递归建立 Shadow DOM 的 MutationObserver ──────────────────
-function observeShadowRoots(root: Node, observer: MutationObserver) {
-  const walk = (node: Node) => {
-    if (node instanceof Element && node.shadowRoot) {
-      observer.observe(node.shadowRoot, { childList: true, subtree: true });
-      walk(node.shadowRoot);
-    }
-    if ("querySelectorAll" in node) {
-      for (const child of (node as ParentNode).querySelectorAll("*")) {
-        if (child.shadowRoot) {
-          observer.observe(child.shadowRoot, {
-            childList: true,
-            subtree: true,
-          });
-          walk(child.shadowRoot);
-        }
-      }
-    }
-  };
-  walk(root);
-}
 
 // ── 定位 #pubdate 节点（穿越两层 Shadow DOM）─────────────────
 function findPubdate(host: Element): Element | null {
@@ -68,6 +35,40 @@ function findPubdate(host: Element): Element | null {
   return actionBtns.shadowRoot.querySelector("#pubdate");
 }
 
+function handleShareClick(e: MouseEvent) {
+  const shareBtn: HTMLElement = (e.target as any)?.closest?.("#share");
+  if (!shareBtn) return;
+
+  const com = (shareBtn.parentNode as any)?.host?.closest?.("#body")?.parentNode
+    ?.host;
+  if (!com) return;
+
+  const rich =
+    com.shadowRoot
+      .querySelector("bili-rich-text")
+      ?.shadowRoot?.querySelector("#contents")?.innerHTML || "";
+  const pics =
+    com.shadowRoot
+      .querySelector("#content #pictures bili-comment-pictures-renderer")
+      ?.shadowRoot?.querySelector("#content")?.innerHTML || "";
+
+  const rect = shareBtn.getBoundingClientRect();
+
+  window.postMessage(
+    {
+      type: "show-share-popup",
+      payload: {
+        rich,
+        pics,
+        data: com.__data,
+        left: rect.left,
+        top: rect.top,
+      },
+    },
+    "*",
+  );
+}
+
 // ── 处理单个目标元素 ────────────────────────────────────────
 function processTargetElement(el: Element, source: string) {
   if (processedHosts.has(el)) return;
@@ -75,7 +76,9 @@ function processTargetElement(el: Element, source: string) {
 
   const tryAppend = (): boolean => {
     const data = (el as any).__data;
-    const location = data?.reply_control?.location;
+    if (!data) return false;
+
+    const location = data.reply_control?.location;
     if (location == null || location === "") return true; // 无 location 则停止
 
     const pubdate = findPubdate(el);
@@ -85,6 +88,35 @@ function processTargetElement(el: Element, source: string) {
     locationAppended.add(pubdate);
     pubdate.textContent += ` ${location}`;
     // console.log(`[inject-comment] ${host.tagName} location:`, location);
+
+    const parentNode = pubdate.parentNode;
+    if (parentNode) {
+      const moreNode = parentNode.querySelector("#more");
+
+      if (moreNode) {
+        const shareSvg = document
+          .querySelector("#share-btn-outer > .video-share-icon")
+          ?.cloneNode(true);
+
+        if (shareSvg) {
+          (shareSvg as HTMLElement).setAttribute("width", "16");
+          (shareSvg as HTMLElement).setAttribute("height", "16");
+
+          const shareBtn = document.createElement("button");
+
+          shareBtn.id = "share";
+          shareBtn.style.position = "relative";
+          shareBtn.style.textAlign = "left";
+
+          shareBtn.addEventListener("click", handleShareClick);
+
+          shareBtn.appendChild(shareSvg);
+
+          parentNode.insertBefore(shareBtn, moreNode);
+        }
+      }
+    }
+
     return true;
   };
 
@@ -126,6 +158,7 @@ function processAddedNode(node: Node, observer: MutationObserver) {
   }
 }
 
+// 入口函数
 export function optimizeComments() {
   queryAllDeep(document, TARGET_SELECTOR).forEach((el) =>
     processTargetElement(el, "initial"),

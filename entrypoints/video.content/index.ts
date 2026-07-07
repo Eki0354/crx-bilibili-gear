@@ -1,10 +1,13 @@
+import { optimizeComments } from "./comments";
 import { optimizeLike } from "./like";
+import './comments/app.scss';
 
 export default defineContentScript({
   matches: ["*://www.bilibili.com/video/*"],
   runAt: "document_end",
-  main() {
+  main(ctx) {
     injectScript("/inject-comments.js");
     optimizeLike();
+    optimizeComments(ctx);
   },
 });

@@ -10,8 +10,8 @@ export default defineConfig({
     permissions: ["clipboardWrite"],
     web_accessible_resources: [
       {
-        resources: ["inject-comments.js"],
-        matches: ["*://www.bilibili.com/*"],
+        resources: ["inject-comments.js", "inject-account.js"],
+        matches: ["*://*.bilibili.com/*"],
       },
     ],
   },

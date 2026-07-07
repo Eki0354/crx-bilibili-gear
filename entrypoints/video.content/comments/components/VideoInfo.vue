@@ -41,6 +41,15 @@ const data = inject<any>("rootData", null);
   gap: 12px;
 }
 
+.title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+
 .cover {
   width: 25%;
   object-fit: cover;

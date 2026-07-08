@@ -1,6 +1,7 @@
 import { optimizeComments } from "./comments";
 import { optimizeLike } from "./like";
 import './comments/app.scss';
+import './like.scss';
 
 export default defineContentScript({
   matches: ["*://www.bilibili.com/video/*"],

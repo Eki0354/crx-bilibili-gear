@@ -1,0 +1,18 @@
+.btn-like-in-player {
+  position: absolute;
+  left: 16px;
+  top: -16px;
+  transform: translateY(-100%);
+  width: unset;
+  height: unset;
+  margin: unset;
+  padding: unset;
+  opacity: 1;
+  transition: opacity 0.2s ease-in;
+}
+
+.bpx-player-container[data-ctrl-hidden="true"]:not(.bpx-player-game-center) {
+  .btn-like-in-player {
+    opacity: 0;
+  }
+}

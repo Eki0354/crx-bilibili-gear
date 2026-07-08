@@ -13,8 +13,10 @@ function initLikeBtn() {
   if (!likeSvg) return;
 
   const newLikeBtn = document.createElement("div");
+  const spClassName = 'btn-like-in-player';
 
   newLikeBtn.className = likeBtn?.className || "";
+  newLikeBtn.classList.add(spClassName);
   newLikeBtn.style.position = "absolute";
   newLikeBtn.style.left = "16px";
   newLikeBtn.style.top = "-16px";
@@ -45,6 +47,7 @@ function initLikeBtn() {
         mutation.attributeName === "class"
       ) {
         newLikeBtn.className = (mutation.target as HTMLElement).className;
+        newLikeBtn.classList.add(spClassName)
       }
     }
   });

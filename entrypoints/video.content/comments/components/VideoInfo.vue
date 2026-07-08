@@ -23,11 +23,23 @@ const title = document.querySelector(
   "#viewbox_report .video-title",
 )?.textContent;
 const views = document.querySelector("#viewbox_report .view-text")?.textContent;
-const upName = document.querySelector(
+let upName = document.querySelector(
   "#mirror-vdcon .up-detail .up-name",
 )?.textContent;
 
-const data = inject<any>("rootData", null);
+// 联合投稿
+if (!upName) {
+  const upNodes = document.querySelectorAll(
+    "#mirror-vdcon .up-panel-container .membersinfo-upcard-wrap .membersinfo-upcard .staff-info",
+  );
+
+  const ups = Array.from(upNodes).map(n => n.children[0]!.textContent);
+
+  upName = ups.join('、');
+}
+
+// 缺少占位
+if (!upName) upName = '-';
 </script>
 
 <style lang="scss" scoped>
@@ -48,6 +60,11 @@ const data = inject<any>("rootData", null);
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-all;
+}
+
+.right {
+  flex: 1;
+  overflow: hidden;
 }
 
 .cover {
@@ -72,6 +89,7 @@ const data = inject<any>("rootData", null);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    word-break: break-all;
   }
 }
 </style>

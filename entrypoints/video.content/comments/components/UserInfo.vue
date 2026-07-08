@@ -38,7 +38,7 @@
           <a
             target="_blank"
             :href="`//space.bilibili.com/${member?.mid}`"
-            :class="member && member.vip.vipType !== 0 && 'is-vip'"
+            :class="member && member.vip.vipType === 2 && 'is-vip'"
           >
             {{ member?.uname || "-" }}
           </a>

@@ -145,8 +145,8 @@ const onMessage = (event: any) => {
 
   if (event.data && event.data.type === "show-share-popup") {
     const { data = null, left = 0, top = 0 } = event.data.payload || {};
-    style.left = left + "px";
-    style.top = top + "px";
+    // style.left = left + "px";
+    // style.top = top + "px";
     rootData.value = data;
 
     loadWidth();
@@ -186,7 +186,9 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .panel {
   position: fixed;
-  transform: translate3d(calc(-50% + 8px), -100%, 0);
+  left: 50%;
+  top: 50%;
+  transform: translate3d(-50%, -50%, 0);
   background: #fff;
   border: 1px solid #e3e5e7;
   border-radius: 8px;

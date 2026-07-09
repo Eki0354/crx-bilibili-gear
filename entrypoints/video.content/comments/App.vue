@@ -1,6 +1,10 @@
 <template>
   <div v-show="visible" ref="panelRef" class="panel" :style="panelStyle">
-    <div class="container" ref="containerRef">
+    <div
+      class="container"
+      :class="isSnapping && 'is-snapping'"
+      ref="containerRef"
+    >
       <UserInfo />
 
       <CommentContents />
@@ -36,6 +40,7 @@ const visible = ref(false);
 const rootData = ref<any | null>(null);
 
 const copyText = ref("复制");
+const isSnapping = ref(false);
 
 provide("data", rootData);
 
@@ -100,34 +105,39 @@ const onClose = () => {
   visible.value = false;
 };
 
-const onCopy = async () => {
+const onCopy = () => {
   if (!containerRef.value) return;
 
+  isSnapping.value = true;
   copyText.value = "生成中...";
-  try {
-    const img = await snapdom.toPng(containerRef.value);
-    const arr = img.src.split(",");
-    const mime = arr[0].match(/:(.*?);/)?.[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8 = new Uint8Array(n);
-    while (n--) {
-      u8[n] = bstr.charCodeAt(n);
+
+  nextTick(async () => {
+    try {
+      const img = await snapdom.toPng(containerRef.value!);
+      const arr = img.src.split(",");
+      const mime = arr[0].match(/:(.*?);/)?.[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8 = new Uint8Array(n);
+      while (n--) {
+        u8[n] = bstr.charCodeAt(n);
+      }
+      const blob = new Blob([u8], { type: mime });
+
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob,
+        }),
+      ]);
+
+      onClose();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      isSnapping.value = false;
+      copyText.value = "复制";
     }
-    const blob = new Blob([u8], { type: mime });
-
-    await navigator.clipboard.write([
-      new ClipboardItem({
-        [blob.type]: blob,
-      }),
-    ]);
-
-    onClose();
-  } catch (error) {
-    console.log(error);
-  }
-
-  copyText.value = "复制";
+  });
 };
 
 const onMessage = (event: any) => {
@@ -186,6 +196,17 @@ onUnmounted(() => {
   box-sizing: border-box;
   color: #9d9d9d;
   font-size: 14px;
+  overflow: hidden;
+
+  .container {
+    max-height: 480px;
+    overflow-y: auto;
+
+    &.is-snapping {
+      max-height: unset;
+      overflow-y: visible;
+    }
+  }
 }
 
 .resize-handle {

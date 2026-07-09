@@ -94,6 +94,7 @@ onUnmounted(() => {
     display: block;
     width: 100%;
     margin-top: 8px;
+    margin-bottom: 8px;
 
     .content {
       position: relative;

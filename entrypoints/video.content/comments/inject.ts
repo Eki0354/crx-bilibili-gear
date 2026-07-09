@@ -79,16 +79,17 @@ function processTargetElement(el: Element, source: string) {
     const data = (el as any).__data;
     if (!data) return false;
 
-    const location = data.reply_control?.location;
-    if (location == null || location === "") return true; // 无 location 则停止
-
     const pubdate = findPubdate(el);
     if (!pubdate) return false; // shadowRoot 内部尚未渲染，等下一轮
 
     if (locationAppended.has(pubdate)) return true;
     locationAppended.add(pubdate);
-    pubdate.textContent += ` ${location}`;
-    // console.log(`[inject-comment] ${host.tagName} location:`, location);
+
+    const location = data.reply_control?.location;
+    if (location !== null && location !== "") {
+      pubdate.textContent += ` ${location}`;
+      // console.log(`[inject-comment] ${host.tagName} location:`, location);
+    }
 
     const parentNode = pubdate.parentNode;
     if (parentNode) {

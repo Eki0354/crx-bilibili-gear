@@ -2,7 +2,7 @@
   "name": "Bilibili Gear",
   "description": "提升Bilibili日常使用体验。",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "scripts": {
     "dev": "wxt",

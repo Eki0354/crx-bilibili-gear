@@ -157,8 +157,11 @@ const onMessage = (event: any) => {
 const onScroll = () => onClose();
 
 const onKeydown = (e: KeyboardEvent) => {
-  if (e.key !== "Escape") return;
-  onClose();
+  if (e.key === "Escape") {
+    onClose();
+  } else if (e.ctrlKey && e.key === "c") {
+    onCopy();
+  }
 };
 
 // 点击 panel 外部区域关闭
@@ -172,7 +175,7 @@ onMounted(() => {
   window.addEventListener("message", onMessage);
   window.addEventListener("scroll", onScroll);
   window.addEventListener("keydown", onKeydown);
-  window.addEventListener("click", onOutsideClick);
+  window.addEventListener("click", onOutsideClick, true);
 });
 
 onUnmounted(() => {
@@ -201,7 +204,7 @@ onUnmounted(() => {
   overflow: hidden;
 
   .container {
-    max-height: 480px;
+    max-height: 80vh;
     overflow-y: auto;
 
     &.is-snapping {

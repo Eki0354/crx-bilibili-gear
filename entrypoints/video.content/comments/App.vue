@@ -195,7 +195,6 @@ onUnmounted(() => {
   background: #fff;
   border: 1px solid #e3e5e7;
   border-radius: 8px;
-  padding: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 9999;
   box-sizing: border-box;
@@ -204,6 +203,7 @@ onUnmounted(() => {
   overflow: hidden;
 
   .container {
+    padding: 16px;
     max-height: 80vh;
     overflow-y: auto;
 

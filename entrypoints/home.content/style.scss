@@ -1,0 +1,3 @@
+.feed-card:not(:has(.bili-video-card__info--date)) {
+  display: none;
+}

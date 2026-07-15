@@ -1,5 +1,12 @@
 ## Bilibili Gear
 
+[v0.0.5]
+
++ 屏蔽首页推荐视频中的广告和推广
++ 修复老评论location显示undefined的问题
++ 删除暂不需要的popup和background代码
++ 优化分享卡片样式
+
 [v0.0.4]
 
 + 优化播放器内点赞按钮始终显示的问题

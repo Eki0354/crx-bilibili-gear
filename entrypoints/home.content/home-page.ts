@@ -10,6 +10,11 @@
 
 import type { PageModifier } from "../../utils/framework";
 
+type AdBlockRule = {
+  selector: string;
+  rule?: (node: Element | null) => boolean;
+};
+
 const homePageModifier: PageModifier = {
   name: "home-page",
   match: (url) => {
@@ -20,31 +25,39 @@ const homePageModifier: PageModifier = {
     );
   },
   modify() {
+    const rules: AdBlockRule[] = [
+      {
+        selector: ".bili-video-card__stats--text",
+        rule: (node) => node?.textContent === "广告",
+      },
+      {
+        selector: ".bili-video-card__info--date",
+      },
+      {
+        selector: ".bili-video-card__stats__duration",
+      },
+      {
+        selector: ".bili-video-card__image--link",
+        rule: (node) =>
+          !(node as HTMLLinkElement | null)?.href.includes(
+            "bilibili.com/video/",
+          ),
+      },
+    ];
+
+    const blockNodeAds = (node: Element) =>
+      rules.some((item) => {
+        const target = node.querySelector(item.selector);
+        const isBlock = item.rule ? item.rule(target) : !target;
+        if (!isBlock) return false;
+
+        // 阿b会根据卡片顺序重新计算样式和描述信息，需要等待计算完成后移除，否则会渲染错位
+        setTimeout(() => node.remove(), 100);
+        return true;
+      });
+
     const cards = document.querySelectorAll(".feed-card");
-
-    Array.from(cards).forEach((card) => {
-      const adNode = card.querySelector(".bili-video-card__stats--text");
-      if (adNode?.textContent === "广告") {
-        card.remove();
-        return;
-      }
-
-      const durationNode = card.querySelector(
-        ".bili-video-card__stats__duration",
-      );
-      if (!durationNode) {
-        card.remove();
-        return;
-      }
-
-      const videoNode: HTMLLinkElement | null = card.querySelector(
-        ".bili-video-card__image--link",
-      );
-      if (!videoNode?.href.includes("bilibili.com/video/")) {
-        card.remove();
-        return;
-      }
-    });
+    Array.from(cards).forEach(blockNodeAds);
   },
 };
 

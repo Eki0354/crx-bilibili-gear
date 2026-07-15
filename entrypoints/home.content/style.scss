@@ -1,3 +1,9 @@
-.feed-card:not(:has(.bili-video-card__info--date)) {
-  display: none;
+.feed-card {
+  &:not(:has(.bili-video-card__info--date)) {
+    visibility: hidden;
+  }
+
+  &:not(:has(.bili-video-card__stats__duration)) {
+    visibility: hidden;
+  }
 }

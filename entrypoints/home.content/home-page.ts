@@ -52,6 +52,7 @@ const homePageModifier: PageModifier = {
         if (!isBlock) return false;
 
         // 阿b会根据卡片顺序重新计算样式和描述信息，需要等待计算完成后移除，否则会渲染错位
+        // 如果需要更好地体验，也可以冻结非广告卡片dom的方式实现，但性能成本对比直接延时移除显然更高
         setTimeout(() => node.remove(), 100);
         return true;
       });

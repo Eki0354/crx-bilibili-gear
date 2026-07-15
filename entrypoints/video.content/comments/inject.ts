@@ -86,7 +86,7 @@ function processTargetElement(el: Element, source: string) {
     locationAppended.add(pubdate);
 
     const location = data.reply_control?.location;
-    if (location !== null && location !== "") {
+    if (!!location) {
       pubdate.textContent += ` ${location}`;
       // console.log(`[inject-comment] ${host.tagName} location:`, location);
     }
